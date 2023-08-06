@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Recados</title>
+</head>
+<body>
+  <h1>Lista de Recados</h1>
+  <div id="recadosList"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const userId = localStorage.getItem("userId");
+
+      // Verificar se o usuário está logado
+      if (!userId) {
+        // Redirecionar para a tela de login
+        window.location.href = "url-da-tela-de-login";
+        return;
+      }
+
+      // Fazer uma chamada à API para obter os recados do usuário com o ID "userId"
+      fetch(`https://seu-servidor.com/recados/${userId}`)
+        .then(response => response.json())
+        .then(recados => {
+          const recadosList = document.getElementById("recadosList");
+
+          // Exibir os recados na página
+          recados.forEach(recado => {
+            const recadoDiv = document.createElement("div");
+            recadoDiv.innerHTML = `
+              <h2>${recado.titulo}</h2>
+              <p>${recado.descricao}</p>
+            `;
+            recadosList.appendChild(recadoDiv);
+          });
+        })
+        .catch(error => {
+          console.error("Erro ao obter os recados:", error);
+        });
+    });
+  </script>
+</body>
+</html>

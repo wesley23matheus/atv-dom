@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+
+<style>
+    
+    div {
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        background: aquamarine;
+        border-radius: 10px;
+        margin: 15px;
+        padding: 20px;
+        width: 450px;
+    }
+    input {
+        display: block;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        outline: none;
+    }
+</style>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login de Usuário</title>
+</head>
+<body>
+  <h1>Login de Usuário</h1>
+  <form id="loginForm">
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email" required><br>
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" name="senha" required><br>
+
+    <button type="button" id="loginButton">Login</button>
+    <button type="button" id="cadastroButton">Cadastre-se</button>
+  </form>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginForm = document.getElementById("loginForm");
+      const loginButton = document.getElementById("loginButton");
+
+      loginButton.addEventListener("click", () => {
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
+
+        // Você precisa fazer a chamada à API de login aqui
+        // Exemplo de chamada usando fetch:
+        fetch("https://seu-servidor.com/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, senha })
+        })
+        .then(response => {
+          if (response.ok) {
+            // Redirecionar para a tela de recados em caso de sucesso
+            window.location.href = "url-da-tela-de-recados";
+          } else {
+            // Mostrar alerta em caso de erro
+            alert("Credenciais inválidas");
+          }
+        })
+        .catch(error => {
+          console.error("Erro ao realizar o login:", error);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
