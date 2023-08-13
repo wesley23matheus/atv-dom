@@ -8,37 +8,56 @@
 <body>
   <h1>Lista de Recados</h1>
   <div id="recadosList"></div>
+  <div id="paginationButtons"></div>
 
   <script>
+    const itemsPerPage = 5; // Quantidade de recados por página
+    let currentPage = 1;
+
     document.addEventListener("DOMContentLoaded", () => {
       const userId = localStorage.getItem("userId");
 
-      // Verificar se o usuário está logado
       if (!userId) {
-        // Redirecionar para a tela de login
         window.location.href = "url-da-tela-de-login";
         return;
       }
 
-      // Fazer uma chamada à API para obter os recados do usuário com o ID "userId"
-      fetch(`https://seu-servidor.com/recados/${userId}`)
-        .then(response => response.json())
-        .then(recados => {
-          const recadosList = document.getElementById("recadosList");
+      const recadosList = document.getElementById("recadosList");
+      const paginationButtons = document.getElementById("paginationButtons");
 
-          // Exibir os recados na página
-          recados.forEach(recado => {
-            const recadoDiv = document.createElement("div");
-            recadoDiv.innerHTML = `
-              <h2>${recado.titulo}</h2>
-              <p>${recado.descricao}</p>
-            `;
-            recadosList.appendChild(recadoDiv);
+      function loadRecados(page) {
+        fetch(`https://seu-servidor.com/recados/${userId}?page=${page}&limit=${itemsPerPage}`)
+          .then(response => response.json())
+          .then(recados => {
+            recadosList.innerHTML = ''; // Limpar recados anteriores
+
+            recados.data.forEach(recado => {
+              const recadoDiv = document.createElement("div");
+              recadoDiv.innerHTML = `
+                <h2>${recado.titulo}</h2>
+                <p>${recado.descricao}</p>
+              `;
+              recadosList.appendChild(recadoDiv);
+            });
+
+            // Criação dos botões de paginação
+            paginationButtons.innerHTML = '';
+            for (let i = 1; i <= recados.totalPages; i++) {
+              const button = document.createElement("button");
+              button.textContent = i;
+              button.addEventListener("click", () => {
+                currentPage = i;
+                loadRecados(currentPage);
+              });
+              paginationButtons.appendChild(button);
+            }
+          })
+          .catch(error => {
+            console.error("Erro ao obter os recados:", error);
           });
-        })
-        .catch(error => {
-          console.error("Erro ao obter os recados:", error);
-        });
+      }
+
+      loadRecados(currentPage);
     });
   </script>
 </body>
