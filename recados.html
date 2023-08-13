@@ -1,64 +1,77 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Recados</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Recados</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Lista de Recados</h1>
-  <div id="recadosList"></div>
-  <div id="paginationButtons"></div>
+    <h1>Lista de Recados</h1>
+    <div id="recadosList"></div>
+    <div id="paginationButtons"></div>
 
-  <script>
-    const itemsPerPage = 5; // Quantidade de recados por página
-    let currentPage = 1;
+    <script>
+        const recadosList = document.getElementById("recadosList");
+        const paginationButtons = document.getElementById("paginationButtons");
+        let currentPage = 1;
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const userId = localStorage.getItem("userId");
+        function fetchRecados(page) {
+            fetch(`https://apirecados.onrender.com/recados/${userId}?page=${page}`)
+                .then(response => response.json())
+                .then(recados => {
+                    recadosList.innerHTML = ""; // Limpar a lista de recados
+                    recados.forEach(recado => {
+                        const recadoDiv = document.createElement("div");
+                        recadoDiv.innerHTML = `
+                            <h2>${recado.titulo}</h2>
+                            <p>${recado.descricao}</p>
+                        `;
+                        recadosList.appendChild(recadoDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error("Erro ao obter os recados:", error);
+                });
+        }
 
-      if (!userId) {
-        window.location.href = "url-da-tela-de-login";
-        return;
-      }
-
-      const recadosList = document.getElementById("recadosList");
-      const paginationButtons = document.getElementById("paginationButtons");
-
-      function loadRecados(page) {
-        fetch(`https://seu-servidor.com/recados/${userId}?page=${page}&limit=${itemsPerPage}`)
-          .then(response => response.json())
-          .then(recados => {
-            recadosList.innerHTML = ''; // Limpar recados anteriores
-
-            recados.data.forEach(recado => {
-              const recadoDiv = document.createElement("div");
-              recadoDiv.innerHTML = `
-                <h2>${recado.titulo}</h2>
-                <p>${recado.descricao}</p>
-              `;
-              recadosList.appendChild(recadoDiv);
-            });
-
-            // Criação dos botões de paginação
-            paginationButtons.innerHTML = '';
-            for (let i = 1; i <= recados.totalPages; i++) {
-              const button = document.createElement("button");
-              button.textContent = i;
-              button.addEventListener("click", () => {
-                currentPage = i;
-                loadRecados(currentPage);
-              });
-              paginationButtons.appendChild(button);
+        function createPaginationButtons(totalPages) {
+            paginationButtons.innerHTML = ""; // Limpar os botões de paginação
+            for (let page = 1; page <= totalPages; page++) {
+                const button = document.createElement("button");
+                button.innerText = page;
+                button.addEventListener("click", () => {
+                    currentPage = page;
+                    fetchRecados(currentPage);
+                });
+                paginationButtons.appendChild(button);
             }
-          })
-          .catch(error => {
-            console.error("Erro ao obter os recados:", error);
-          });
-      }
+        }
 
-      loadRecados(currentPage);
-    });
-  </script>
+        // Função para obter o total de recados e criar botões de paginação
+        function fetchTotalRecados() {
+            fetch(`https://apirecados.onrender.com/recados/${userId}`)
+                .then(response => response.json())
+                .then(recados => {
+                    const totalPages = Math.ceil(recados.length / 10); // Assumindo 10 recados por página
+                    createPaginationButtons(totalPages);
+                })
+                .catch(error => {
+                    console.error("Erro ao obter os recados:", error);
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const userId = localStorage.getItem("userId");
+
+            if (!userId) {
+                window.location.href = "url-da-tela-de-login";
+                return;
+            }
+
+            fetchRecados(currentPage);
+            fetchTotalRecados();
+        });
+    </script>
 </body>
 </html>
